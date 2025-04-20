@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ProjectHub - VIIT</title>
+    <!-- Add Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!-- Remove extra space/margin between logo and header -->
+    <div style="text-align: center; margin-bottom: 0;">
+        <img src="http://vignaniit.edu.in/images/09%20copy-1.jpg" 
+             alt="This is VIGNAN logo"  
+             style="width: 100%; height: auto; display: block; margin-bottom: 0;"/>
+    </div>
+    <!-- Header -->
+    <header style="margin-top: 0;">
+        <div class="header-container">
+            <div class="logo-container">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhj1lyqXoOx1gAixFhndTzWTDy9mBmqkelCA&s" alt="VIIT Logo" class="logo">
+                <span class="site-title">ProjectHub</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active">Home</a></li>
+                    <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSfrDTPCDn6ExkHLdUMEui6jghR8Mh8AkAzP_oGkQk1A8uBeGQ/viewform?usp=header">Add New Project</a></li>
+                    <li><a href="#">Reviews</a></li>
+                    <li><a href="#" id="aboutUsLink">About Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Responsive Design */
+        html {
+            font-size: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            html {
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            html {
+                font-size: 12px;
+            }
+        }
+            
+        body {
+            background-image: url('https://wallpaperaccess.com/full/1930875.jpg');
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover; /* Ensures the image covers the whole page */
+            background-position: center;
+            color: #333;
+            line-height: 1.6;
+        }
+            
+        /* Header Styles */
+        header {
+            background: linear-gradient(to right, #0c4a6e, #0e7490);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            flex-wrap: wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                padding: 10px;
+                gap: 15px;
+            }
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            height: 60px;
+            margin-right: 15px;
+        }
+        
+        .site-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .search-container {
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 5px 15px;
+            width: 250px;
+        }
+        
+        .search-container input {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 8px;
+            width: 100%;
+            outline: none;
+        }
+        
+        .search-container input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        nav li {
+            margin: 0 10px;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            transition: color 0.3s;
+            display: block;
+            text-align: center;
+            font-size: 1rem;
+        }
+        
+        @media (max-width: 480px) {
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            nav li {
+                margin: 5px 0;
+                width: 100%;
+            }
+            
+            nav a {
+                padding: 10px;
+                border-radius: 5px;
+                background-color: rgba(255, 255, 255, 0.1);
+                width: 100%;
+            }
+        }
+        
+        nav a:hover {
+            color: #4ade80;
+        }
+        
+        /* Filter Section */
+        .filter-section {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .filter-controls {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        /* Projects Grid */
+        .projects-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+            opacity: 1; /* Set opacity to 90% */
+            transition: opacity 0.3s;
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+            opacity: 0.98; /* Decreased opacity for the project grid */
+            background: transparent;
+        }
+        
+        @media (max-width: 768px) {
+            .projects-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+                padding: 0 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+        
+        .project-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .project-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            opacity: 1; /* Ensure images are fully visible */
+            transition: opacity 0.3s;
+        }
+        
+        .project-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .department-badge {
+            align-self: flex-start;
+            background-color: #e0f2fe;
+            color: #0369a1;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .project-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #0c4a6e;
+        }
+        
+        .project-description {
+            color: #555;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .tag {
+            background: #f3f4f6;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 12px;
+            color: #4b5563;
+        }
+        
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: auto;
+            border-top: 1px solid #f3f4f6;
+            padding-top: 12px;
+        }
+        
+        .no-projects {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 50px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        /* Footer */
+        footer {
+            background-color: #0c4a6e;
+            color: white;
+            text-align: center;
+            padding: 25px 0;
+            margin-top: 50px;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .search-container {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            nav {
+                margin-top: 10px;
+                width: 100%;
+            }
+            
+            nav ul {
+                justify-content: space-between;
+            }
+            
+            nav li {
+                margin-left: 0;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;     
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            font-size: 28px;
+            cursor: pointer;
+            background: #fff;
+            border-radius: 50%;
+            padding: 5px 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            border: none;
+            color: #0c4a6e;
+            transition: background 0.2s, color 0.2s;
+        }
+        .close-modal:hover {
+            background: #0c4a6e;
+            color: #fff;
+        }
+
+        /* AI Section Styles */
+        .ai-section {
+            margin-top: 2rem;
+            border-top: 1px solid #eee;
+            padding-top: 1.5rem;
+        }
+
+        .ai-links {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .ai-links a {
+            text-decoration: none;
+            color: #0c4a6e;
+            font-weight: bold;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 0 0 auto;
+            padding: 0 10px;
+        }
+
+        .ai-links a:hover {
+            color: #4ade80;
+        }
+
+        .ai-logo {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 10px;
+        }
+        
+        /* AI Section Styles */
+        .ai-section {
+            margin-top: 2rem;
+            border-top: 1px solid #eee;
+            padding-top: 1.5rem;
+        }
+        .ai-links {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .ai-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #333;
+            padding: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+            background-color: #f5f9ff;
+            border: 1px solid #e0e0e0;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s forwards;
+            animation-delay: calc(0.1s * var(--ai-index));
+        }
+        
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .ai-link:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background-color: #f0f7ff;
+        }
+        
+        .ai-logo {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+        
+        /* About Us Modal */
+        #aboutUsModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #aboutUsModal .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        #aboutUsModal .close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        #aboutUsModal .close:hover {
+            color: #000;
+        }
+
+        #aboutUsModal h2 {
+            margin-top: 10px;
+        }
+        
+        /* Home Modal */
+        #homeModal .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
+
+        #homeModal .close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            z-index: 1;
+        }
+
+        #homeModal .close:hover {
+            color: #000;
+        }
+
+        #homeModal h2 {
+            margin-top: 10px;
+        }
+        
+        /* Chat box popup: 50% of viewport */
+        .chatbox-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 50vw;
+            height: 50vh;
+            max-width: 800px;
+            max-height: 600px;
+            text-align: center;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+
+        /* AI bots/image/prompt popup: 66.66% of viewport */
+        .aibots-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 66.66vw;
+            height: 66.66vh;
+            max-width: 1200px;
+            max-height: 900px;
+            text-align: center;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: #0c4a6e;
+            color: white;
+            text-align: center;
+            padding: 25px 0;
+            margin-top: 50px;
+        }
+        
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .search-container {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            nav {
+                margin-top: 10px;
+                width: 100%;
+            }
+            
+            nav ul {
+                justify-content: space-between;
+            }
+            
+            nav li {
+                margin-left: 0;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .ai-links {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        button, input[type="button"], input[type="submit"] {
+            min-height: 44px;
+            min-width: 44px;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            #aiAssistantPopup {
+                width: 95vw !important;
+                right: -10px !important;
+                left: 0 !important;
+                border-radius: 10px !important;
+                padding: 10px !important;
+            }
+        }
+    </style>
+    <!-- Include Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Include our simplified filtering script -->
+    <script src="simple-filter.js"></script>
+    
+    <script>
+        // Function to show project details in a modal
+        function showModal(project) {
+            // Create a new modal each time
+            let modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'projectModal';
+            
+            // Create the modal content
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <img src="${project.image}" alt="${project.title}" style="width:100%; height:300px; object-fit:cover; border-radius:10px;">
+                    <h2 style="margin-top:1rem;">${project.title}</h2>
+                    <div style="margin:1rem 0;">
+                        <span class="department-badge">${project.department}</span>
+                        <span style="margin-left:1rem;">${project.year}</span>
+                    </div>
+                    <p style="margin:1rem 0;">${project.description}</p>
+                    <div class="project-tags" style="margin:1rem 0;">
+                        ${Array.isArray(project.tags) ? project.tags.map(tag => `<span class="tag">${tag}</span>`).join('') : ''}
+                    </div>
+                    
+                    <div class="ai-section">
+                        <h3>Explore with AI Assistants:</h3>
+                        <div class="ai-links">
+                            <a href="https://chat.openai.com/" target="_blank" class="ai-link" data-ai="chatgpt">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg" alt="ChatGPT" class="ai-logo">
+                                ChatGPT
+                            </a>
+                            <a href="https://gemini.google.com/" target="_blank" class="ai-link" data-ai="gemini">
+                                <img src="https://logowik.com/content/uploads/images/google-ai-gemini91216.logowik.com.webp" alt="Gemini" class="ai-logo">
+                                Gemini
+                            </a>
+                            <a href="https://copilot.microsoft.com/" target="_blank" class="ai-link" data-ai="microsoft">
+                                <img src="https://www.shutterstock.com/image-vector/colorful-logo-design-on-white-600nw-2504051213.jpg" alt="Microsoft Copilot" class="ai-logo">
+                                Microsoft Copilot
+                            </a>
+                            
+                            <a href="https://google.com/search" target="_blank" class="ai-link" data-ai="google">
+                                <img src="https://media.wired.com/photos/5926ffe47034dc5f91bed4e8/master/pass/google-logo.jpg" alt="Google" class="ai-logo">
+                                Google
+                            </a>
+                            <a href="https://www.youtube.com/results" target="_blank" class="ai-link" data-ai="youtube">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/YouTube_icon_%282013-2017%29.png" alt="YouTube" class="ai-logo">
+                                YouTube
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            
+            // Show modal immediately
+            modal.style.display = 'flex';
+            
+            // Close modal when clicking X or outside
+            const closeBtn = modal.querySelector('.close-modal');
+            closeBtn.onclick = () => {
+                modal.style.display = 'none';
+                modal.remove();
+            };
+            
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    modal.remove();
+                }
+            };
+            
+            // Make AI chatbot links functional
+            const aiLinks = modal.querySelectorAll('.ai-link');
+            const searchPrompt = `${project.title} ${project.department} project ${Array.isArray(project.tags) ? project.tags.join(' ') : ''} ${project.description}`;
+            
+            aiLinks.forEach(link => {
+                const aiType = link.getAttribute('data-ai');
+                let url = link.getAttribute('href');
+                
+                switch(aiType) {
+                    case 'google':
+                        url = `https://www.google.com/search?q=${encodeURIComponent(searchPrompt)}`;
+                        link.setAttribute('href', url);
+                        break;
+                    case 'youtube':
+                        url = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchPrompt)}`;
+                        link.setAttribute('href', url);
+                        break;
+                }
+                
+                // For AI assistants that don't support direct URL parameters
+                if (['chatgpt', 'gemini', 'microsoft', 'copilot'].includes(aiType)) {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        navigator.clipboard.writeText(searchPrompt).then(() => {
+                            alert(`Project details copied to clipboard! You can paste them into ${link.textContent.trim()} after it opens.`);
+                            window.open(url, '_blank');
+                        }).catch(err => {
+                            console.error('Could not copy text:', err);
+                            window.open(url, '_blank');
+                        });
+                    });
+                }
+            });
+        }
+    </script>
+        
+        <section class="filter-section">
+            <div class="filter-controls">
+                <div class="filter-group">
+                    <label for="departmentFilter">Department</label>
+                    <select id="departmentFilter">
+                        <option value="all">All Departments</option>
+                        <option value="CSE">Computer Science and Engineering</option>
+                        <option value="ACSE">Advanced Computer Science Engineering</option>
+                        <option value="EEE">Electrical and Electronics Engineering</option>
+                        <option value="ECE">Electronics and Communication Engineering</option>
+                        <option value="MECH">Mechanical Engineering</option>
+                        <option value="CIVIL">Civil Engineering</option>
+                        <option value="IT">Information Technology</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="yearFilter">Year</label>
+                    <select id="yearFilter">
+                        <option value="all">All Years</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Projects Grid Container -->
+        <div class="projects-container">
+            <div id="projectsGrid" class="projects-grid">
+                <!-- Projects will be loaded here by JavaScript -->
+            </div>
+        </div>
+        
+        <footer>
+            <div class="footer-container">
+                <p>&copy; 2025 ProjectHub - Vignan Institute of Information Technology</p>
+            </div>
+        </footer>
+        
+        <!-- Home Modal -->
+        <div id="homeModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div class="home-content" style="text-align: center; padding: 20px;">
+                    <h2 style="color: #0c4a6e; margin-bottom: 20px; font-size: 2em;">"Every line of code has a story."</h2>
+                    <h3 style="color: #333; margin-bottom: 15px;">Welcome to the ACSE Project Hub</h3>
+                    <p style="color: #666; font-size: 1.1em; line-height: 1.6; margin-bottom: 20px;">A living archive of innovation, passion, and purpose.</p>
+                    <p style="color: #666; font-size: 1.1em; line-height: 1.6;">Dive into a showcase of past brilliance, where ideas were transformed into impactful solutions by our brightest minds.</p>
+                    <h4 style="color: #4ade80; margin-top: 25px; font-size: 1.2em;">Discover. Learn. Get Inspired.</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Us Modal -->
+        <div id="aboutUsModal" class="modal">
+            <div class="modal-content" style="background: rgba(255,255,255,0.95); color: #222;">
+                <span class="close">&times;</span>
+                <h2>About ProjectHub</h2>
+                <div class="about-content" style="padding: 10px 0;">
+                    <p>
+                        ProjectHub is designed to showcase student projects from Vignan Institute of Information Technology. Our mission is to provide a space where students can share their innovative ideas, technical achievements, and creative solutions with the wider community.
+                    </p>
+                    <ul style="margin: 1em 0 1em 1.5em; color: #333;">
+                        <li><strong>Browse:</strong> Explore a diverse collection of student projects across various departments and academic years.</li>
+                        <li><strong>Project Submission:</strong> Students can submit their projects for review and inclusion in our showcase.</li>
+                        <li><strong>AI Integration:</strong> Explore projects with the help of AI assistants to better understand concepts and implementations.</li>
+                        <li><strong>Community:</strong> Connect with fellow students, share feedback, and collaborate on future projects.</li>
+                    </ul>
+                    <h3 style="color: #0c4a6e; margin-top: 1.5em;">Join Our Community</h3>
+                    <p>
+                        Contribute your projects and be part of this growing community of innovators and problem-solvers!
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+       <!-- Reviews Modal -->
+<div id="reviewsModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Reviews</h2>
+        <p>Explore reviews and feedback from students and faculty on various projects.</p>
+        <form id="reviewForm" style="margin: 1em 0;">
+            <input type="text" id="reviewerName" placeholder="Your Name" required style="padding:8px; width:40%; margin-right:10px;">
+            <input type="text" id="reviewText" placeholder="Your Review" required style="padding:8px; width:40%;">
+            <button type="submit" style="padding:8px 16px; margin-left:10px;">Submit</button>
+        </form>
+        <div id="reviewsList" style="text-align:left; margin-top:1em;">
+            <!-- Reviews will be loaded here -->
+        </div>
+    </div>
+</div>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const aboutUsLink = document.getElementById('aboutUsLink');
+                const aboutUsModal = document.getElementById('aboutUsModal');
+                const closeButton = aboutUsModal.querySelector('.close');
+
+                aboutUsLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    aboutUsModal.style.display = 'flex';
+                });
+
+                closeButton.addEventListener('click', function() {
+                    aboutUsModal.style.display = 'none';
+                });
+
+                window.addEventListener('click', function(e) {
+                    if (e.target === aboutUsModal) {
+                        aboutUsModal.style.display = 'none';
+                    }
+                });
+
+                // Home Modal functionality
+                const homeLink = document.querySelector('nav ul li a.active');
+                homeLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.reload(); // Refreshes the page
+                });
+
+                // Reviews Modal functionality
+                const reviewsLink = document.querySelector('nav ul li a[href="#"]:not(.active):not(#aboutUsLink)');
+                const reviewsModal = document.getElementById('reviewsModal');
+                const reviewsCloseButton = reviewsModal.querySelector('.close');
+
+                reviewsLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    reviewsModal.style.display = 'flex';
+                    document.body.style.cursor = 'default'; // Ensure cursor is original when modal opens
+                });
+
+                reviewsCloseButton.addEventListener('click', function() {
+                    reviewsModal.style.display = 'none';
+                    document.body.style.cursor = 'default'; // Restore original cursor when closing
+                });
+
+                window.addEventListener('click', function(e) {
+                    if (e.target === reviewsModal) {
+                        reviewsModal.style.display = 'none';
+                        document.body.style.cursor = 'default'; // Restore original cursor when closing
+                    }
+                });
+            });
+        </script>
+
+      
+</body>
+</html>
